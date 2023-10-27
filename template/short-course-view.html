@@ -1,0 +1,229 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<!--app-content open-->
+<div class="main-content app-content mt-0">
+    <div class="side-app">
+
+        <!-- CONTAINER -->
+        <div class="main-container container-fluid">
+
+            <!-- PAGE-HEADER -->
+            <div class="page-header">
+                <h1 class="page-title">Short Term Course View</h1>
+                <a href="{% url 'short_term_course_create' %}" class="btn btn-danger btn-pill">Add <i class="fa fa-plus"></i></a>
+
+            </div>
+            <!-- PAGE-HEADER END -->
+
+
+            <div class="row">
+                <div class="col-xl-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Short Term Course Table</h3>
+                        </div>
+                        <div class="card-body">
+
+                            <div class="table-responsive">
+                                <div class="table-responsive">
+                                    <table class="table border text-nowrap text-md-nowrap table-hover mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Sl No</th>
+                                                <th>Image</th>
+                                                <th>Title</th>
+                                                <th>Subtitle</th>
+                                                <th>Description</th>
+                                                <th>Details</th>
+                                                <th>Satus</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!-- TABLE DETAILS -->
+                                            {% for course in courses %}
+                                            <tr>
+                                                <td>{{ forloop.counter }}</td>
+                                                <td>
+                                                    <img class="d-block img-fluid br-5 img-td"
+                                                        src="{{ course.image.url }}" alt="{{ course.title }}">
+                                                </td>
+                                                <td> {{ course.title }}</td>
+                                                <td>
+                                                    {{ course.subtitle }}
+                                                </td>
+
+                                                <td><a class="btn btn-primary" data-bs-toggle="modal"
+                                                        data-bs-target="#description{{ course.id }}">
+                                                        <i class="side-menu__icon fe fe-eye text-white"></i>
+                                                    </a>
+                                                </td>
+                                                <td><a class="btn btn-dark" data-bs-toggle="modal"
+                                                        data-bs-target="#crsdetail{{ course.id }}">
+                                                        <i class="side-menu__icon fe fe-list text-white"></i>
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    {% if course.status %}
+                                                        <span class="btn btn-success">Active</span>
+                                                    {% else %}
+                                                        <span class="btn btn-danger">Inactive</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    <!-- <a class=" btn btn-info" href="">
+                                                        <i class="side-menu__icon fe fe-edit"></i>
+                                                    </a> -->
+
+                                                    <a class="btn btn-danger" data-bs-toggle="modal"
+                                                        data-bs-target="#modaldemo5{{ course.id }}">
+                                                        <i class="side-menu__icon fe fe-trash text-white"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                            <!-- TABLE DETAILS END -->
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+
+                                </div>
+                                <div class="card-body">
+
+                                    <ul class="pagination">
+                                        <li class="page-item page-prev">
+                                            <a class="page-link" href="" tabindex="-1">Prev</a>
+                                        </li>
+                                        <li class="page-item active"><a class="page-link" href="">1</a></li>
+                                        <li class="page-item"><a class="page-link" href="">2</a></li>
+                                        <li class="page-item"><a class="page-link" href="">3</a></li>
+                                        <li class="page-item"><a class="page-link" href="">4</a></li>
+                                        <li class="page-item page-next">
+                                            <a class="page-link" href="">Next</a>
+                                        </li>
+                                    </ul>
+                                    <!-- pagination-wrapper -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+            </div>
+            <!-- CONTAINER END -->
+        </div>
+    </div>
+    <!--app-content close-->
+
+
+    {% for course in courses %}
+    <div class="modal  fade" id="modaldemo5{{ course.id }}" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-md modal-dialog-centered text-center" role="document">
+            <div class="modal-content ">
+
+                <div class="modal-body">
+                    <button aria-label="Close" class="btn-close position-absolute" data-bs-dismiss="modal"><span
+                            aria-hidden="true">&times;</span></button>
+                    <i class="icon icon-close fs-70 text-danger lh-1 my-5 d-inline-block"></i>
+                    <h4 class="text-danger">Are You Sure Do You Want To Delete ?</h4>
+                    <p class="mg-b-20 mg-x-20">Item Will be Deleted Permanently</p>
+                   
+                </div>
+                <div class="modal-footer justify-content-center">
+                <button class="btn btn-success" onclick="deleteCourse({{ course.id }})">Yes</button>
+                    <button aria-label="Close" class="btn btn-danger pd-x-25" data-bs-dismiss="modal">Cancel</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+    <!-- MESSAGE MODAL -->
+    {% for course in courses %}
+    <div class="modal  fade" id="description{{ course.id }}" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-md modal-dialog-centered text-center" role="document">
+            <div class="modal-content ">
+
+                <div class="modal-body">
+                    <button aria-label="Close" class="btn-close position-absolute" data-bs-dismiss="modal"><span
+                            aria-hidden="true">&times;</span></button>
+
+                    <h4 class="text-primary">Description</h4>
+                    <p class="mg-b-20 mg-x-20">{{ course.description }}</p>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+    <!-- Course Detail  MODAL -->
+    {% for course in courses %}
+    <div class="modal  fade" id="crsdetail{{ course.id }}" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg modal-dialog-centered text-center" role="document">
+            <div class="modal-content ">
+
+                <div class="modal-body">
+                    <button aria-label="Close" class="btn-close position-absolute" data-bs-dismiss="modal"><span
+                            aria-hidden="true">&times;</span></button>
+
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{{ course.title }}</td>
+                                <td>{{ course.description }}</td>
+                                
+                            </tr>
+                           
+                        </tbody>
+                    </table>
+
+                </div>
+                <div class="modal-footer justify-content-center">
+               
+                    <button aria-label="Close" class="btn btn-danger pd-x-25" data-bs-dismiss="modal">Cancel</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function deleteCourse(courseId) {
+            $.ajax({
+                type: "POST",  // You can change the HTTP method as needed (e.g., GET, DELETE, etc.)
+                url: "{% url 'delete_course' %}",  // Replace with the actual URL of your delete_course view
+                data: {
+                    'course_id': courseId
+                },
+                success: function(data) {
+                    // Check the response from the server for success
+                    if (data.success) {
+                        // Reload the page upon successful deletion
+                        location.reload();
+                    } else {
+                        alert("Course deletion failed.");  // Display an error message if needed
+                    }
+                },
+                error: function(xhr, textStatus, error) {
+                    console.error("AJAX request failed: " + textStatus + ", " + error);
+                }
+            });
+        }
+        </script>
+    
+
+    <!-- <?php include("footer.php"); ?> -->
+    {% endblock content %}
