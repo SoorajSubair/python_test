@@ -41,14 +41,14 @@
                                                 <th>Action</th>
                                             </tr>
                                         </thead>
-                                        <tbody>
+                                        <tbody class="table-body">
                                             <!-- TABLE DETAILS -->
                                             {% for course in courses %}
                                             <tr>
                                                 <td>{{ forloop.counter }}</td>
                                                 <td>
                                                     <img class="d-block img-fluid br-5 img-td"
-                                                        src="{{ course.image.url }}" alt="{{ course.title }}">
+                                                        src="{{ course.imageUrl }}" alt="{{ course.title }}">
                                                 </td>
                                                 <td> {{ course.title }}</td>
                                                 <td>
@@ -89,22 +89,22 @@
                                     </table>
 
                                 </div>
-                                <div class="card-body">
-
+                                <div class="card-body" id="pagination-container">
                                     <ul class="pagination">
                                         <li class="page-item page-prev">
-                                            <a class="page-link" href="" tabindex="-1">Prev</a>
+                                            <a class="page-link"  onclick="loadPage(1)" tabindex="-1">Prev</a>
                                         </li>
-                                        <li class="page-item active"><a class="page-link" href="">1</a></li>
-                                        <li class="page-item"><a class="page-link" href="">2</a></li>
-                                        <li class="page-item"><a class="page-link" href="">3</a></li>
-                                        <li class="page-item"><a class="page-link" href="">4</a></li>
+                                        {% for page_num in courses.paginator.page_range %}
+                                            <li class="page-item{% if page_num == current_page %} active{% endif %}">
+                                                <a class="page-link"  onclick="loadPage({{ page_num }})">{{ page_num }}</a>
+                                            </li>
+                                        {% endfor %}
                                         <li class="page-item page-next">
-                                            <a class="page-link" href="">Next</a>
+                                            <a class="page-link"  onclick="loadPage({{ total_pages }})">Last</a>
                                         </li>
                                     </ul>
-                                    <!-- pagination-wrapper -->
                                 </div>
+                                
                             </div>
                         </div>
                     </div>
@@ -118,7 +118,7 @@
     </div>
     <!--app-content close-->
 
-
+    <span id="modaldemo5">
     {% for course in courses %}
     <div class="modal  fade" id="modaldemo5{{ course.id }}" tabindex="-1" role="dialog">
         <div class="modal-dialog modal-md modal-dialog-centered text-center" role="document">
@@ -141,8 +141,10 @@
         </div>
     </div>
     {% endfor %}
+    </span>
 
     <!-- MESSAGE MODAL -->
+    <span id="description">
     {% for course in courses %}
     <div class="modal  fade" id="description{{ course.id }}" tabindex="-1" role="dialog">
         <div class="modal-dialog modal-md modal-dialog-centered text-center" role="document">
@@ -161,8 +163,10 @@
         </div>
     </div>
     {% endfor %}
+    </span>
 
     <!-- Course Detail  MODAL -->
+    <span id="crsdetail">
     {% for course in courses %}
     <div class="modal  fade" id="crsdetail{{ course.id }}" tabindex="-1" role="dialog">
         <div class="modal-dialog modal-lg modal-dialog-centered text-center" role="document">
@@ -199,6 +203,8 @@
         </div>
     </div>
     {% endfor %}
+    </span>
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         function deleteCourse(courseId) {
@@ -223,7 +229,31 @@
             });
         }
         </script>
-    
+
+        <script>
+            function loadPage(pageNumber) {
+                $.ajax({
+                    type: "GET",  // Use GET to retrieve the data
+                    url: "{% url 'short_term_course' %}",  // Replace with the URL of your view
+                    data: { 'page': pageNumber },
+                    success: function(data) {
+                        var newTableBody = $(data).find(".table-body");
+                        $(".table-body").replaceWith(newTableBody);
+                        var crsdetailBody = $(data).find("#crsdetail");
+                        $("#crsdetail").replaceWith(crsdetailBody);
+                        var descriptionBody = $(data).find("#description");
+                        $("#description").replaceWith(descriptionBody);
+                        var modaldemo5Body = $(data).find("#modaldemo5");
+                        $("#modaldemo5").replaceWith(modaldemo5Body);
+                        var paginationContainerBody = $(data).find("#pagination-container");
+                        $("#pagination-container").replaceWith(paginationContainerBody);
+                    },
+                    error: function(xhr, textStatus, error) {
+                        console.error("AJAX request failed: " + textStatus + ", " + error);
+                    }
+                });
+            }
+        </script>
 
     <!-- <?php include("footer.php"); ?> -->
     {% endblock content %}

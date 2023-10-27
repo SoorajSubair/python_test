@@ -6,6 +6,8 @@ from django.http import JsonResponse
 from django.views.decorators.cache import never_cache
 from django.contrib.auth import update_session_auth_hash
 from django.views.decorators.csrf import csrf_exempt
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
 # Create your views here.
 
 
@@ -82,9 +84,24 @@ def short_term_course(request):
     if request.user.is_authenticated:
         user = request.user
         courses = ShortTermCourse.objects.filter(user=user).order_by('-id')
-        context = {"courses": courses}
-        return render(request,'short-course-view.html', context)
 
+        # Number of items to display per page
+        items_per_page = 5
+        paginator = Paginator(courses, items_per_page)
+        page = request.GET.get('page')
+
+        try:
+            courses = paginator.page(page)
+        except PageNotAnInteger:
+            courses = paginator.page(1)
+        except EmptyPage:
+            courses = paginator.page(paginator.num_pages)
+
+        # Calculate the total number of pages
+        total_pages = paginator.num_pages
+
+        context = {"courses": courses, "current_page": courses.number, "total_pages": total_pages}
+        return render(request, 'short-course-view.html', context)
     return redirect(user_login)
 
 @never_cache
